@@ -1,0 +1,34 @@
+(defun test (x y)
+  (+ x y)
+  )
+
+(defclass ola()
+  (slot1))
+
+
+
+
+(defun print-list-list (list)
+  (loop for a in list
+       do(print a)))
+
+(defmacro def-class (name &rest values)
+  (print name)
+  (print-list-list values)
+  `(print (concatenate 'string "make-" )
+	  ))
+
+(defmacro when-Xd (condition &rest body)
+  `(if ,condition (progn ,@body)))
+
+(defun lolada (x)
+  (when (> x 10) (print 'big)))
+
+;;;(defun make-arguments (&rest values)
+ ; (setq returnList NIL)
+ ; (loop for a in list
+  ;     do(append (concatenate 'string "make-"))))
+	    
+	  
+(defmacro ola-123 (lol)
+  `(print (concatenate 'string "make-" ,lol)))
