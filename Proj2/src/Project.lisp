@@ -37,7 +37,16 @@
       (delete-duplicates toReturn)
   )
 )
-
+(defun get-list-slots (list-of-classes)
+ (let ((toReturn nil) 
+       (string-slots nil) 
+      ) 
+      (loop for element in list-of-classes do
+            (setf string-slots (create-hash-map-key-slots element)) 
+            (concatenate 'list toReturn (gethash string-slots meta-hash)) 
+      )   (delete-duplicates toReturn)   
+      
+ ) 
 
 (defmacro def-class (supers &optional slots &rest amaraleautista)
   (let ((realSupers nil)
