@@ -34,7 +34,7 @@
        )
     ; (loop while (listp name)
     ; )
-      toReturn
+      (delete-duplicates toReturn)
   )
 )
 
