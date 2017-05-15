@@ -1,8 +1,5 @@
 ; (defmacro define_meta_hash()
 ; (define_meta_hash)
-(defun 123load-file()
- (load "~/FAC/PAVA/PAVA2_1617/Proj2/src/Project.lisp"))
-
 (defvar meta-hash (make-hash-table :test #'equal))
 
 (defun print-hash ()
@@ -46,9 +43,10 @@
       (loop for element in list-of-classes do
             (setf string-slots (create-hash-map-key-slots element))
             (concatenate 'list toReturn (gethash string-slots meta-hash))
-      )   (delete-duplicates toReturn)
-
- ))
+      )
+   (delete-duplicates toReturn)
+ )
+)
 
 (defmacro def-class (supers &optional slots &rest amaraleautista)
   (let ((realSupers nil)
