@@ -1,5 +1,7 @@
 ; (defmacro define_meta_hash()
 ; (define_meta_hash)
+(defun 123load-file()
+ (load "~/FAC/PAVA/PAVA2_1617/Proj2/src/Project.lisp"))
 
 (defvar meta-hash (make-hash-table :test #'equal))
 
@@ -38,15 +40,15 @@
   )
 )
 (defun get-list-slots (list-of-classes)
- (let ((toReturn nil) 
-       (string-slots nil) 
-      ) 
+ (let ((toReturn nil)
+       (string-slots nil)
+      )
       (loop for element in list-of-classes do
-            (setf string-slots (create-hash-map-key-slots element)) 
-            (concatenate 'list toReturn (gethash string-slots meta-hash)) 
-      )   (delete-duplicates toReturn)   
-      
- ) 
+            (setf string-slots (create-hash-map-key-slots element))
+            (concatenate 'list toReturn (gethash string-slots meta-hash))
+      )   (delete-duplicates toReturn)
+
+ ))
 
 (defmacro def-class (supers &optional slots &rest amaraleautista)
   (let ((realSupers nil)
@@ -61,6 +63,7 @@
         (string_slots nil)
 
         (lista_herancas nil)
+        (lista_slots nil)
 
         )
 
@@ -96,7 +99,7 @@
     ;   do
     (setf lista_herancas (get-list-super-classes classname))
     (print lista_herancas)
-
+    (setf lista_slots (get-list-slots classname))
     ; for inheritance:
     ; juntar inheritance de todos
     ;
@@ -151,21 +154,21 @@
 
 
 
- ; (setf vector_make_instance (concatenate 'list (list 'vector) slots))
- ; `(progn
- ;
- ;   ;   (write-line 5))
- ;   ;(print '(defclass ,className ,realSupers ,slots))
- ;   ;(print '(defun ,(intern (concatenate 'string (string '#:MAKE-) (string className))) ,slots_make_instance
- ;   ;   ;  (write-line "5"))
- ;   ;    (make-instance ',classname)
- ;   ;    ,vector_make_instance)
- ;
- ;   ;)
- ;
- ;   ;;;; Define the class
- ;   ;(defclass ,className ,realSupers ,slots)
- ;   ;(print '(setf (symbol ',className) ,vector_make_instance))
- ;   ;(setf (symbol ',className) ,vector_make_instance)
- ;
- ;   ;;;; make-className
+; (setf vector_make_instance (concatenate 'list (list 'vector) slots))
+; `(progn
+;
+;   ;   (write-line 5))
+;   ;(print '(defclass ,className ,realSupers ,slots))
+;   ;(print '(defun ,(intern (concatenate 'string (string '#:MAKE-) (string className))) ,slots_make_instance
+;   ;   ;  (write-line "5"))
+;   ;    (make-instance ',classname)
+;   ;    ,vector_make_instance)
+;
+;   ;)
+;
+;   ;;;; Define the class
+;   ;(defclass ,className ,realSupers ,slots)
+;   ;(print '(setf (symbol ',className) ,vector_make_instance))
+;   ;(setf (symbol ',className) ,vector_make_instance)
+;
+;   ;;;; make-className
