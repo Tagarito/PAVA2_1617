@@ -1,0 +1,12 @@
+(defmacro ola ()
+  (defvar meta-hash (make-hash-table))
+  (print 5)
+)
+
+(defun print-hash ()
+  (print 'printing)
+  (defun print-hash-entry (key value)
+    (format t "Key: ~S ,Value: ~S~%" key value)
+    )
+  (maphash #'print-hash-entry meta-hash)
+)
