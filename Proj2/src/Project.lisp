@@ -1,5 +1,6 @@
 ; (defmacro define_meta_hash()
 ; (define_meta_hash)
+
 (defvar meta-hash (make-hash-table :test #'equal))
 
 (defun print-hash ()
@@ -12,6 +13,32 @@
   (maphash #'print-hash-entry meta-hash)
 )
 
+(defun create-hash-map-key-inheritance (name)
+  (concatenate 'string (string name) (string '-) (string 'inheritance))
+)
+(defun create-hash-map-key-slots (name)
+  (concatenate 'string (string name) (string '-) (string 'slots))
+)
+
+(defun get-list-super-classes (name)
+  (let (
+        (direct_supers nil)
+        (string_inheritance (create-hash-map-key-inheritance name))
+        (toReturn (list name))
+       )
+       (setf direct_supers (gethash string_inheritance meta-hash))
+       (if (listp direct_supers)
+         (loop for element in direct_supers do
+           (if (not (equal (string name) (string element))) (setf toReturn (concatenate 'list (get-list-super-classes element) toReturn )) ())
+         )
+       )
+    ; (loop while (listp name)
+    ; )
+      toReturn
+  )
+)
+
+
 (defmacro def-class (supers &optional slots &rest amaraleautista)
   (let ((realSupers nil)
         (className nil)
@@ -23,6 +50,8 @@
 
         (string_inheritance nil)
         (string_slots nil)
+
+        (lista_herancas nil)
 
         )
 
@@ -41,9 +70,9 @@
              (setf loop_class_slots (cons slots amaraleautista))
              )
       )
-    (setf string_inheritance (concatenate 'string (string className) (string '-) (string 'inheritance)))
+    (setf string_inheritance (create-hash-map-key-inheritance classname))
     (print string_inheritance)
-    (setf string_slots (concatenate 'string (string className) (string '-) (string 'slots)))
+    (setf string_slots (create-hash-map-key-slots classname))
     (print string_slots)
     (print supers)
     (print loop_class_slots)
@@ -53,14 +82,17 @@
     (setf (gethash string_inheritance meta-hash) supers)
     (setf (gethash string_slots meta-hash) loop_class_slots)
 
+    ; herancas
+    ; while (listp get-value )
+    ;   do
+    (setf lista_herancas (get-list-super-classes classname))
+    (print lista_herancas)
+
     ; for inheritance:
     ; juntar inheritance de todos
     ;
     ; for slots de todos:
     ; juntar slots
-    ; (print slots_make_instance)
-    ; (print vector_make_instance)
-    ; (print loop_class_slots)
 
     (let ((index 0))
       (setf getter_template  (loop for element in loop_class_slots
