@@ -3,7 +3,7 @@
 (defun 123load-file()
   (progn
 
- (load "~/FAC/PAVA/PAVA2_1617/Proj2/src/Project.lisp")
+ (load "~/FAC/PAVA/PAVA2_1617/Proj2/src/load.lisp")
  (load "~/FAC/PAVA/PAVA2_1617/Proj2/src/classes.lisp")
 )
 )
@@ -88,7 +88,7 @@
         (lista_herancas nil)
         (lista_completa_slots nil)
         (inner_instance_hashtable nil)
-
+        (validate_class_template nil)
         )
 
     (if (listp supers)
@@ -96,77 +96,60 @@
               (setf realSupers (cdr supers)))
       (setf className supers)
     )
-    ; (setf classname (transform-to-string className))
-    ; (setf realSupers (transform-to-string realsupers))
 
-    ;(print slots)
-    ; (print amaraleautista)
-    ; (print slots)
-    ; (print amaraleautista)
     (if (not (null slots))
-      (progn (setf inner_instance_hashtable (make-hash-table :test #'equal))
-            ;  (setf vector_make_instance (cons 'vector (cons slots amaraleautista)))
+      (progn
              (setf loop_class_slots (cons slots amaraleautista))
       )
     )
+    (setf inner_instance_hashtable (make-hash-table :test #'equal))
     (setf string_inheritance (create-hash-map-key-inheritance classname))
-    ; (print string_inheritance)
     (setf string_slots (create-hash-map-key-slots classname))
-    ; (print string_slots)
-    (format t "supers: ~a~%" supers)
-
-    ; (print loop_class_slots)
-
-    ;(print (remhash ,string_inheritance meta-hash))
-    ;(print (remhash ,string_slots meta-hash))
+    ; (format t "supers: ~a~%" supers)
 
     (setf (gethash string_inheritance meta-hash) supers)
     (setf (gethash string_slots meta-hash) loop_class_slots)
 
-    ; herancas
-    ; while (listp get-value )
-    ;   do
     (setf lista_herancas (get-list-super-classes classname))
-    (format t "lista-herancas: ~a~%" lista_herancas)
+    ; (format t "lista-herancas: ~a~%" lista_herancas)
     (setf lista_completa_slots (get-list-slots lista_herancas))
-    (format t "lista_completa_slots: ~a~%" lista_completa_slots)
-    ; for inheritance:
-    ; juntar inheritance de todos
-    ;
-    ; for slots de todos:
-    ; juntar slots
+    ; (format t "lista_completa_slots: ~a~%" lista_completa_slots)
+
     (setf getter_template  (loop for element in lista_completa_slots
                                ; collect (string element)
                                collect `(defun ,(intern (concatenate 'string (string classname) (string '-) (string element))) (instance)
-                                          (gethash (string ',element) (cdr instance))
+                                          (if (,(intern (concatenate 'string (string classname) (string '?) )) instance)
+                                            (gethash (string ',element) (cdr instance))
+                                            (progn
+                                             (format t "Instance is not a ~S~%" ',classname)
+                                             nil)
+                                          )
                                      )
                             )
     )
     (setf setter_template  (loop for element in lista_completa_slots
-                               ; collect (string element)
                                collect `(defun ,(intern (concatenate 'string (string 'set-) (string classname) (string '-) (string element))) (instance value)
-                                          (setf (gethash (string ',element) (cdr instance)) value)
+                                          (if (,(intern (concatenate 'string (string classname) (string '?) )) instance)
+                                              (setf (gethash (string ',element) (cdr instance)) value)
+                                              (progn
+                                               (format t "Instance is not a ~S~%" ',classname)
+                                               nil)
+                                          )
                                      )
                             )
     )
     (setf initial_definition_template  (loop for element in lista_completa_slots
-                               ; collect (string element)
                                           collect `(,(intern (concatenate 'string (string 'set-) (string classname) (string '-) (string element))) instance ,element)
                                        )
     )
+    (setf validate_class_template `(defun ,(intern (concatenate 'string (string classname) (string '?))) (instance)
+                  (if (listp instance)
+                   (not (null (position ',classname (car instance))))
+                   nil
+                  )
+          )
+    )
 
-    ; (print initial_definition_template)
-
-
-      ;  ;(defun ,(intern (concatenate 'string (string `,className) (string '-) (string `,element))) ())
-      ;  )
-      ; )
-
-      ; (print
-      ; (loop for element in getter_template
-      ;   (element)
-      ; )
-      ; )
       (if (not (null lista_completa_slots))
         (setf lista_slots_with_&key (cons '&key lista_completa_slots))
         ()
@@ -174,6 +157,7 @@
       (setf macro_value
 
             `(progn
+              ,validate_class_template
               ,@getter_template
               ,@setter_template
                (defun ,(intern (concatenate 'string (string '#:MAKE-) (string className))) ,lista_slots_with_&key
@@ -185,11 +169,6 @@
                            )
                          )
                )
-              ;  (print (string (concatenate 'string (string ',className) (string '-) (string element))))
-              ;  (print `(defun ,(concatenate 'string (string ',className) (string '-) (string element)) ()
-              ;                   )
-              ;        )
-              ;  )
               )
         )
 
