@@ -119,7 +119,7 @@
                                ; collect (string element)
                                collect `(defun ,(intern (concatenate 'string (string classname) (string '-) (string element))) (instance)
                                           (if (,(intern (concatenate 'string (string classname) (string '?) )) instance)
-                                            (gethash (string ',element) (cdr instance))
+                                            (gethash (string ',element) (car (cdr instance)))
                                             (progn
                                              (format t "Instance is not a ~S~%" ',classname)
                                              nil)
@@ -130,7 +130,7 @@
     (setf setter_template  (loop for element in lista_completa_slots
                                collect `(defun ,(intern (concatenate 'string (string 'set-) (string classname) (string '-) (string element))) (instance value)
                                           (if (,(intern (concatenate 'string (string classname) (string '?) )) instance)
-                                              (setf (gethash (string ',element) (cdr instance)) value)
+                                              (setf (gethash (string ',element) (car (cdr instance))) value)
                                               (progn
                                                (format t "Instance is not a ~S~%" ',classname)
                                                nil)
@@ -144,7 +144,7 @@
     )
     (setf validate_class_template `(defun ,(intern (concatenate 'string (string classname) (string '?))) (instance)
                   (if (listp instance)
-                   (not (null (position ',classname (car instance))))
+                   (and (equal (list-length instance) 2) (equal (list-length (cdr instance)) 1) (not (null (position ',classname (car instance)))) (hash-table-p (car (cdr instance))))
                    nil
                   )
           )
@@ -163,7 +163,7 @@
                (defun ,(intern (concatenate 'string (string '#:MAKE-) (string className))) ,lista_slots_with_&key
                          (let ((instance nil))
                            (progn
-                            (setf instance (cons ',lista_herancas ,inner_instance_hashtable))
+                            (setf instance (list ',lista_herancas ,inner_instance_hashtable))
                             ,@initial_definition_template
                             instance
                            )
