@@ -1,5 +1,13 @@
 ; (defmacro define_meta_hash()
 ; (define_meta_hash)
+(defun 123load-file()
+  (progn
+
+ (load "~/FAC/PAVA/PAVA2_1617/Proj2/src/Project.lisp")
+ (load "~/FAC/PAVA/PAVA2_1617/Proj2/src/classes.lisp")
+)
+)
+
 (defvar meta-hash (make-hash-table :test #'equal))
 
 (defun print-hash ()
@@ -33,35 +41,53 @@
        )
     ; (loop while (listp name)
     ; )
-      (delete-duplicates toReturn)
+    (delete-duplicates toReturn :from-end T)
+    ; toreturn
   )
 )
 (defun get-list-slots (list-of-classes)
  (let ((toReturn nil)
        (string-slots nil)
       )
+      (if (not (listp list-of-classes))
+           (setf list-of-classes (list list-of-classes))
+           ()
+        )
       (loop for element in list-of-classes do
             (setf string-slots (create-hash-map-key-slots element))
-            (concatenate 'list toReturn (gethash string-slots meta-hash))
+            ; (print string-slots)
+            ; (print (gethash string-slots meta-hash))
+            (setf toReturn (concatenate 'list toReturn (gethash string-slots meta-hash)))
       )
+    ; (print (delete-duplicates toReturn))
    (delete-duplicates toReturn)
+
  )
 )
 
+(defun transform-to-string (arg)
+  (if (listp arg)
+    (mapcar #'(lambda (x) (concatenate 'string (string x) (string ""))) arg)
+    (concatenate 'string (string arg) (string ""))
+  )
+)
 (defmacro def-class (supers &optional slots &rest amaraleautista)
   (let ((realSupers nil)
         (className nil)
-        (slots_make_instance nil)
-        (vector_make_instance (vector))
+        (lista_slots_with_&key nil)
+        ; (vector_make_instance (vector))
         (loop_class_slots nil)
         (getter_template nil)
+        (setter_template nil)
+        (initial_definition_template nil)
         (macro_value nil)
 
         (string_inheritance nil)
         (string_slots nil)
 
         (lista_herancas nil)
-        (lista_slots nil)
+        (lista_completa_slots nil)
+        (inner_instance_hashtable nil)
 
         )
 
@@ -69,26 +95,31 @@
       (progn  (setf className (car supers))
               (setf realSupers (cdr supers)))
       (setf className supers)
-      )
+    )
+    ; (setf classname (transform-to-string className))
+    ; (setf realSupers (transform-to-string realsupers))
 
     ;(print slots)
     ; (print amaraleautista)
-
+    ; (print slots)
+    ; (print amaraleautista)
     (if (not (null slots))
-      (progn (setf slots_make_instance (cons '&key (cons slots amaraleautista)))
-             (setf vector_make_instance (cons 'vector (cons slots amaraleautista)))
+      (progn (setf inner_instance_hashtable (make-hash-table :test #'equal))
+            ;  (setf vector_make_instance (cons 'vector (cons slots amaraleautista)))
              (setf loop_class_slots (cons slots amaraleautista))
-             )
       )
+    )
     (setf string_inheritance (create-hash-map-key-inheritance classname))
-    (print string_inheritance)
+    ; (print string_inheritance)
     (setf string_slots (create-hash-map-key-slots classname))
-    (print string_slots)
-    (print supers)
-    (print loop_class_slots)
+    ; (print string_slots)
+    (format t "supers: ~a~%" supers)
+
+    ; (print loop_class_slots)
 
     ;(print (remhash ,string_inheritance meta-hash))
     ;(print (remhash ,string_slots meta-hash))
+
     (setf (gethash string_inheritance meta-hash) supers)
     (setf (gethash string_slots meta-hash) loop_class_slots)
 
@@ -96,22 +127,37 @@
     ; while (listp get-value )
     ;   do
     (setf lista_herancas (get-list-super-classes classname))
-    (print lista_herancas)
-    (setf lista_slots (get-list-slots classname))
+    (format t "lista-herancas: ~a~%" lista_herancas)
+    (setf lista_completa_slots (get-list-slots lista_herancas))
+    (format t "lista_completa_slots: ~a~%" lista_completa_slots)
     ; for inheritance:
     ; juntar inheritance de todos
     ;
     ; for slots de todos:
     ; juntar slots
-
-    (let ((index 0))
-      (setf getter_template  (loop for element in loop_class_slots
+    (setf getter_template  (loop for element in lista_completa_slots
                                ; collect (string element)
-                               collect `(defun ,(intern (concatenate 'string (string classname) (string '-) (string element))) (instance) (aref instance ,index))
-                               do
-                               (setf index (+ index 1)
+                               collect `(defun ,(intern (concatenate 'string (string classname) (string '-) (string element))) (instance)
+                                          (gethash (string ',element) (cdr instance))
+                                     )
+                            )
+    )
+    (setf setter_template  (loop for element in lista_completa_slots
+                               ; collect (string element)
+                               collect `(defun ,(intern (concatenate 'string (string 'set-) (string classname) (string '-) (string element))) (instance value)
+                                          (setf (gethash (string ',element) (cdr instance)) value)
+                                     )
+                            )
+    )
+    (setf initial_definition_template  (loop for element in lista_completa_slots
+                               ; collect (string element)
+                                          collect `(,(intern (concatenate 'string (string 'set-) (string classname) (string '-) (string element))) instance ,element)
+                                       )
+    )
 
-                                     )))
+    ; (print initial_definition_template)
+
+
       ;  ;(defun ,(intern (concatenate 'string (string `,className) (string '-) (string `,element))) ())
       ;  )
       ; )
@@ -121,52 +167,33 @@
       ;   (element)
       ; )
       ; )
-
+      (if (not (null lista_completa_slots))
+        (setf lista_slots_with_&key (cons '&key lista_completa_slots))
+        ()
+      )
       (setf macro_value
 
             `(progn
-
-
-              (print '(defun ,(intern (concatenate 'string (string '#:MAKE-) (string className))) ,slots_make_instance
-                        ,vector_make_instance
-                        ))
-              (defun ,(intern (concatenate 'string (string '#:MAKE-) (string className))) ,slots_make_instance
-                ,vector_make_instance
-                )
               ,@getter_template
-
-
-
+              ,@setter_template
+               (defun ,(intern (concatenate 'string (string '#:MAKE-) (string className))) ,lista_slots_with_&key
+                         (let ((instance nil))
+                           (progn
+                            (setf instance (cons ',lista_herancas ,inner_instance_hashtable))
+                            ,@initial_definition_template
+                            instance
+                           )
+                         )
+               )
               ;  (print (string (concatenate 'string (string ',className) (string '-) (string element))))
               ;  (print `(defun ,(concatenate 'string (string ',className) (string '-) (string element)) ()
               ;                   )
               ;        )
               ;  )
               )
-            )
+        )
+
       (print macro_value)
       macro_value
-      )
-    )
+  )
 )
-
-
-
-; (setf vector_make_instance (concatenate 'list (list 'vector) slots))
-; `(progn
-;
-;   ;   (write-line 5))
-;   ;(print '(defclass ,className ,realSupers ,slots))
-;   ;(print '(defun ,(intern (concatenate 'string (string '#:MAKE-) (string className))) ,slots_make_instance
-;   ;   ;  (write-line "5"))
-;   ;    (make-instance ',classname)
-;   ;    ,vector_make_instance)
-;
-;   ;)
-;
-;   ;;;; Define the class
-;   ;(defclass ,className ,realSupers ,slots)
-;   ;(print '(setf (symbol ',className) ,vector_make_instance))
-;   ;(setf (symbol ',className) ,vector_make_instance)
-;
-;   ;;;; make-className
