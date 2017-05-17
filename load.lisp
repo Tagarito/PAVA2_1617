@@ -4,7 +4,6 @@
 (defun print-hash (hash)
   (format t "printing~%")
 
-  ; (print '\n)
   (defun print-hash-entry (key value)
     (format t "Key: ~S ,Value: ~S~%" key value)
     )
@@ -40,16 +39,12 @@
       (if (not (listp list-of-classes))
            (setf list-of-classes (list list-of-classes))
            ()
-        )
+      )
       (loop for element in list-of-classes do
             (setf string-slots (create-hash-map-key-slots element))
-            ; (print string-slots)
-            ; (print (gethash string-slots meta-hash))
             (setf toReturn (concatenate 'list toReturn (gethash string-slots meta-hash)))
       )
-    ; (print (delete-duplicates toReturn))
    (delete-duplicates toReturn)
-
  )
 )
 
@@ -92,7 +87,6 @@
     (setf inner_instance_hashtable (make-hash-table :test #'equal))
     (setf string_inheritance (create-hash-map-key-inheritance classname))
     (setf string_slots (create-hash-map-key-slots classname))
-    ; (format t "supers: ~a~%" supers)
 
     (setf (gethash string_inheritance meta-hash) supers)
     (setf (gethash string_slots meta-hash) loop_class_slots)
@@ -110,8 +104,8 @@
                                              (format t "Instance is not a ~S~%" ',classname)
                                              nil)
                                           )
-                                     )
-                            )
+                                        )
+                          )
     )
     (setf setter_template  (loop for element in lista_completa_slots
                                collect `(defun ,(intern (concatenate 'string (string 'set-) (string classname) (string '-) (string element))) (instance value)
@@ -121,7 +115,7 @@
                                                (format t "Instance is not a ~S~%" ',classname)
                                                nil)
                                           )
-                                     )
+                                        )
                             )
     )
     (setf initial_definition_template  (loop for element in lista_completa_slots
