@@ -10,14 +10,14 @@
 
 (defvar meta-hash (make-hash-table :test #'equal))
 
-(defun print-hash ()
+(defun print-hash (hash)
   (format t "printing~%")
 
   ; (print '\n)
   (defun print-hash-entry (key value)
     (format t "Key: ~S ,Value: ~S~%" key value)
     )
-  (maphash #'print-hash-entry meta-hash)
+  (maphash #'print-hash-entry hash)
 )
 
 (defun create-hash-map-key-inheritance (name)
@@ -172,7 +172,7 @@
               )
         )
 
-      (print macro_value)
+      ;(print macro_value)
       macro_value
   )
 )
