@@ -1,12 +1,3 @@
-; (defmacro define_meta_hash()
-; (define_meta_hash)
-(defun 123load-file()
-  (progn
-
- (load "~/FAC/PAVA/PAVA2_1617/Proj2/src/load.lisp")
- (load "~/FAC/PAVA/PAVA2_1617/Proj2/src/classes.lisp")
-)
-)
 
 (defvar meta-hash (make-hash-table :test #'equal))
 
@@ -39,10 +30,7 @@
            (if (not (equal (string name) (string element))) (setf toReturn (concatenate 'list (get-list-super-classes element) toReturn )) ())
          )
        )
-    ; (loop while (listp name)
-    ; )
     (delete-duplicates toReturn :from-end T)
-    ; toreturn
   )
 )
 (defun get-list-slots (list-of-classes)
@@ -75,7 +63,6 @@
   (let ((realSupers nil)
         (className nil)
         (lista_slots_with_&key nil)
-        ; (vector_make_instance (vector))
         (loop_class_slots nil)
         (getter_template nil)
         (setter_template nil)
@@ -116,7 +103,6 @@
     ; (format t "lista_completa_slots: ~a~%" lista_completa_slots)
 
     (setf getter_template  (loop for element in lista_completa_slots
-                               ; collect (string element)
                                collect `(defun ,(intern (concatenate 'string (string classname) (string '-) (string element))) (instance)
                                           (if (,(intern (concatenate 'string (string classname) (string '?) )) instance)
                                             (gethash (string ',element) (car (cdr instance)))
